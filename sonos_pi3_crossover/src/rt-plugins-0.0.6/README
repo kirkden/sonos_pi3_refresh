@@ -1,0 +1,41 @@
+Compiling
+~~~~~~~~~
+
+Install with
+   cd build
+   cmake ..
+   make
+   sudo make install
+
+By default this installs plugins in /usr/local/lib/ladspa.  If
+you want them to go somewhere else, configure cmake accordingly
+by running 'ccmake .'
+
+You should set the environment variable LADSPA_PATH to contain the
+path to the plugins, so they can be found.  Something like this:
+
+export LADSPA_PATH=/usr/local/lib/ladspa:/usr/lib/ladspa
+
+You probably want to put this in your ~/.bashrc or some such.
+
+
+Platform-specific issues
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The code sets flags in the floating point processor, so that denormal floating
+point numbers don't cause a performance hit, should they occur.  This is
+platform-specific, and requires compiling with -msse2 -mfpmath=sse.  So far as
+I know, these instruction sets are only implemented on Intel and Athlon
+processors.  Compiling for other architectures will probably require some
+changes to the source code.
+
+You can set USE_SSE2 to off using ccmake if you do not want to use SSE2.
+
+
+Bug reports
+~~~~~~~~~~~
+Please send bug reports or comments to rtaylor@tru.ca.
+
+Enjoy,
+   Richard
+

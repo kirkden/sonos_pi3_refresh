@@ -1,0 +1,24 @@
+#!/bin/bash
+# clean up everything for distribution
+
+# delete files created by cmake:
+rm -rf build/*
+rm -rf src/CMakeFiles
+rm -f src/CMakeCache.txt
+rm -f CMakeCache.txt
+rm -f cmake_install.cmake
+rm -f install_manifest.txt
+rm -f Makefile
+rm -f src/Makefile
+rm -f src/cmake_install.cmake
+
+# delete gedit backups:
+find -name "*~" -print0 | xargs -0 rm -f
+
+# delete big wav files generated in testing:
+find ./testing -name "*wav" -print0 | xargs -0 rm -f
+
+# delete object code from testing folder:
+rm ./testing/*.o
+rm ./testing/*.so
+

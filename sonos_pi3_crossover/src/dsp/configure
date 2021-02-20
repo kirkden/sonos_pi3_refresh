@@ -1,0 +1,198 @@
+#!/bin/sh
+
+PREFIX=/usr
+BINDIR=/bin
+LIBDIR=/lib
+DATADIR=/share
+MANDIR=/man
+CC=${CC:-"cc"}
+CXX=${CXX:-"c++"}
+
+USAGE="Usage: $0 [option ...]
+
+Options:
+  --disable-dsp
+  --disable-sndfile
+  --disable-ffmpeg
+  --disable-fftw3
+  --disable-zita-convolver
+  --disable-alsa
+  --disable-ao
+  --disable-mad
+  --disable-pulse
+  --disable-ladspa_dsp
+  --debug-build
+  --prefix=path (default: $PREFIX)
+  --bindir=path (default: $BINDIR)
+  --libdir=path (default: $LIBDIR)
+  --datadir=path (default: $DATADIR)
+  --mandir=path (default: $MANDIR)
+  --no-config
+  --help"
+
+for i in "$@"; do
+	case "$i" in
+		--no-config) NO_CONFIG=y ;;
+	esac
+done
+
+[ "$NO_CONFIG" != "y" -a -f ./.config ] && . ./.config
+
+for i in "$@"; do
+	case "$i" in
+		--disable-dsp)            CONFIG_DISABLE_DSP=y ;;
+		--disable-sndfile)        CONFIG_DISABLE_SNDFILE=y ;;
+		--disable-ffmpeg)         CONFIG_DISABLE_FFMPEG=y ;;
+		--disable-fftw3)          CONFIG_DISABLE_FFTW3=y ;;
+		--disable-zita-convolver) CONFIG_DISABLE_ZITA_CONVOLVER=y ;;
+		--disable-alsa)           CONFIG_DISABLE_ALSA=y ;;
+		--disable-ao)             CONFIG_DISABLE_AO=y ;;
+		--disable-mad)            CONFIG_DISABLE_MAD=y ;;
+		--disable-pulse)          CONFIG_DISABLE_PULSE=y ;;
+		--disable-ladspa_dsp)     CONFIG_DISABLE_LADSPA_DSP=y ;;
+		--debug-build)            CONFIG_DEBUG_BUILD=y ;;
+		--prefix=*)               PREFIX="${i#--prefix=}" ;;
+		--bindir=*)               BINDIR="${i#--bindir=}" ;;
+		--libdir=*)               LIBDIR="${i#--libdir=}" ;;
+		--datadir=*)              DATADIR="${i#--datadir=}" ;;
+		--mandir=*)               MANDIR="${i#--mandir=}" ;;
+		--no-config) ;;
+		--help) echo "$USAGE"; exit 0 ;;
+		*) echo "error: invalid option: $i"; echo "$USAGE"; exit 1 ;;
+	esac
+done
+
+# usage: check_pkg package_name disable objects cflags
+check_pkg_dsp() {
+	if [ "$2" != "y" ] && pkg-config --exists $1; then
+		echo "[dsp] enabled $3 ($1)"
+		DSP_OPTIONAL_OBJECTS="$DSP_OPTIONAL_OBJECTS $3"
+		DSP_OPTIONAL_PACKAGES="$DSP_OPTIONAL_PACKAGES $1"
+		DSP_EXTRA_CFLAGS="$DSP_EXTRA_CFLAGS $4"
+		return 0
+	else
+		echo "[dsp] disabled $3 ($1)"
+		return 1
+	fi
+}
+
+check_pkg_ladspa_dsp() {
+	if [ "$2" != "y" ] && pkg-config --exists $1; then
+		echo "[ladspa_dsp] enabled $3 ($1)"
+		LADSPA_DSP_OPTIONAL_OBJECTS="$LADSPA_DSP_OPTIONAL_OBJECTS $3"
+		LADSPA_DSP_OPTIONAL_PACKAGES="$LADSPA_DSP_OPTIONAL_PACKAGES $1"
+		LADSPA_DSP_EXTRA_CFLAGS="$LADSPA_DSP_EXTRA_CFLAGS $4"
+		return 0
+	else
+		echo "[ladspa_dsp] disabled $3 ($1)"
+		return 1
+	fi
+}
+
+check_header() {
+	echo "#include <$1>" | $CC -E - > /dev/null 2>&1
+}
+
+check_lib() {
+	echo 'int main(){return 0;}' | $CC $LDFLAGS -o /dev/null -x c -l"$1" - > /dev/null 2>&1
+}
+
+unset TARGETS INSTALL_TARGETS UNINSTALL_TARGETS
+unset DSP_OPTIONAL_OBJECTS DSP_OPTIONAL_CPP_OBJECTS DSP_OPTIONAL_PACKAGES DSP_EXTRA_CFLAGS DSP_EXTRA_LIBS
+unset LADSPA_DSP_OPTIONAL_OBJECTS LADSPA_DSP_OPTIONAL_CPP_OJBECTS LADSPA_DSP_OPTIONAL_PACKAGES LADSPA_DSP_EXTRA_CFLAGS LADSPA_DSP_EXTRA_LIBS
+
+if [ "$CONFIG_DISABLE_DSP" != "y" ]; then
+	echo "enabled dsp"
+	TARGETS="$TARGETS dsp"
+	INSTALL_TARGETS="$INSTALL_TARGETS install_dsp"
+	UNINSTALL_TARGETS="$UNINSTALL_TARGETS uninstall_dsp"
+	if check_header ladspa.h && check_header ltdl.h && check_lib ltdl; then
+		DSP_OPTIONAL_OBJECTS="$DSP_OPTIONAL_OBJECTS ladspa_host.o"
+		DSP_EXTRA_LIBS="$DSP_EXTRA_LIBS -lltdl"
+		DSP_EXTRA_CFLAGS="$DSP_EXTRA_CFLAGS -DENABLE_LADSPA_HOST"
+		echo "[dsp] enabled ladspa_host.o"
+	else
+		echo "[dsp] disabled ladspa_host.o"
+	fi
+	check_pkg_dsp sndfile "$CONFIG_DISABLE_SNDFILE" sndfile.o -DHAVE_SNDFILE
+	check_pkg_dsp "libavcodec libavformat libavutil" "$CONFIG_DISABLE_FFMPEG" ffmpeg.o -DHAVE_FFMPEG
+	check_pkg_dsp fftw3 "$CONFIG_DISABLE_FFTW3" "resample.o fir.o fir_p.o" -DHAVE_FFTW3
+	if [ "$CONFIG_DISABLE_ZITA_CONVOLVER" != "y" ] && check_header zita-convolver.h && check_lib zita-convolver; then
+		DSP_OPTIONAL_CPP_OBJECTS="$DSP_OPTIONAL_CPP_OBJECTS zita_convolver.o"
+		DSP_EXTRA_LIBS="$DSP_EXTRA_LIBS -lzita-convolver"
+		DSP_EXTRA_CFLAGS="$DSP_EXTRA_CFLAGS -DHAVE_ZITA_CONVOLVER"
+		echo "[dsp] enabled zita_convolver.o"
+	else
+		echo "[dsp] disabled zita_convolver.o"
+	fi
+	check_pkg_dsp alsa "$CONFIG_DISABLE_ALSA" alsa.o -DHAVE_ALSA
+	check_pkg_dsp ao "$CONFIG_DISABLE_AO" ao.o -DHAVE_AO
+	check_pkg_dsp mad "$CONFIG_DISABLE_MAD" mp3.o -DHAVE_MAD
+	check_pkg_dsp libpulse-simple "$CONFIG_DISABLE_PULSE" pulse.o -DHAVE_PULSE
+else
+	echo "disabled dsp"
+fi
+
+if [ "$CONFIG_DISABLE_LADSPA_DSP" != "y" ] && check_header ladspa.h; then
+	echo "enabled ladspa_dsp"
+	TARGETS="$TARGETS ladspa_dsp"
+	INSTALL_TARGETS="$INSTALL_TARGETS install_ladspa_dsp"
+	UNINSTALL_TARGETS="$UNINSTALL_TARGETS uninstall_ladspa_dsp"
+	unset INCLUDE_CODECS
+	if check_header ltdl.h && check_lib ltdl; then
+		LADSPA_DSP_OPTIONAL_OBJECTS="$LADSPA_DSP_OPTIONAL_OBJECTS ladspa_host.o"
+		LADSPA_DSP_EXTRA_LIBS="$LADSPA_DSP_EXTRA_LIBS -lltdl"
+		LADSPA_DSP_EXTRA_CFLAGS="$LADSPA_DSP_EXTRA_CFLAGS -DENABLE_LADSPA_HOST"
+		echo "[ladspa_dsp] enabled ladspa_host.o"
+	else
+		echo "[ladspa_dsp] disabled ladspa_host.o"
+	fi
+	check_pkg_ladspa_dsp fftw3 "$CONFIG_DISABLE_FFTW3" "fir.o fir_p.o" -DHAVE_FFTW3 && INCLUDE_CODECS=y
+	if [ "$CONFIG_DISABLE_ZITA_CONVOLVER" != "y" ] && check_header zita-convolver.h && check_lib zita-convolver; then
+		INCLUDE_CODECS=y
+		LADSPA_DSP_OPTIONAL_CPP_OBJECTS="$LADSPA_DSP_OPTIONAL_CPP_OBJECTS zita_convolver.o"
+		LADSPA_DSP_EXTRA_LIBS="$LADSPA_DSP_EXTRA_LIBS -lzita-convolver"
+		LADSPA_DSP_EXTRA_CFLAGS="$LADSPA_DSP_EXTRA_CFLAGS -DHAVE_ZITA_CONVOLVER"
+		echo "[ladspa_dsp] enabled zita_convolver.o"
+	else
+		echo "[ladspa_dsp] disabled zita_convolver.o"
+	fi
+	if [ "$INCLUDE_CODECS" = "y" ]; then
+		LADSPA_DSP_OPTIONAL_OBJECTS="$LADSPA_DSP_OPTIONAL_OBJECTS codec.o sampleconv.o"
+		check_pkg_ladspa_dsp sndfile "$CONFIG_DISABLE_SNDFILE" sndfile.o -DHAVE_SNDFILE \
+			|| check_pkg_ladspa_dsp "libavcodec libavformat libavutil" "$CONFIG_DISABLE_FFMPEG" ffmpeg.o -DHAVE_FFMPEG \
+			|| echo "[ladspa_dsp] WARNING: The fir, fir_p, and zita_convolver effects cannot be used without either sndfile or ffmpeg"
+		# Extra codecs
+		#LADSPA_DSP_OPTIONAL_OBJECTS="$LADSPA_DSP_OPTIONAL_OBJECTS null.o pcm.o"
+		#check_pkg_ladspa_dsp "libavcodec libavformat libavutil" "$CONFIG_DISABLE_FFMPEG" ffmpeg.o -DHAVE_FFMPEG
+		#check_pkg_ladspa_dsp mad "$CONFIG_DISABLE_MAD" mp3.o -DHAVE_MAD
+	fi
+else
+	echo "disabled ladspa_dsp"
+fi
+
+echo "all: $TARGETS
+install: $INSTALL_TARGETS install_manual
+uninstall: $UNINSTALL_TARGETS uninstall_manual
+
+PREFIX := $PREFIX
+BINDIR := $BINDIR
+LIBDIR := $LIBDIR
+DATADIR := $DATADIR
+MANDIR := $MANDIR
+DSP_OBJ += $DSP_OPTIONAL_OBJECTS
+DSP_CPP_OBJ += $DSP_OPTIONAL_CPP_OBJECTS
+DSP_EXTRA_CFLAGS := $DSP_EXTRA_CFLAGS $([ -n "$DSP_OPTIONAL_PACKAGES" ] && pkg-config --cflags $DSP_OPTIONAL_PACKAGES)
+DSP_EXTRA_LIBS := $DSP_EXTRA_LIBS $([ -n "$DSP_OPTIONAL_PACKAGES" ] && pkg-config --libs $DSP_OPTIONAL_PACKAGES)
+LADSPA_DSP_OBJ += $LADSPA_DSP_OPTIONAL_OBJECTS
+LADSPA_DSP_CPP_OBJ += $LADSPA_DSP_OPTIONAL_CPP_OBJECTS
+LADSPA_DSP_EXTRA_CFLAGS := $LADSPA_DSP_EXTRA_CFLAGS $([ -n "$LADSPA_DSP_OPTIONAL_PACKAGES" ] && pkg-config --cflags $LADSPA_DSP_OPTIONAL_PACKAGES)
+LADSPA_DSP_EXTRA_LIBS := $LADSPA_DSP_EXTRA_LIBS $([ -n "$LADSPA_DSP_OPTIONAL_PACKAGES" ] && pkg-config --libs $LADSPA_DSP_OPTIONAL_PACKAGES)" > config.mk
+
+if [ "$CONFIG_DEBUG_BUILD" = "y" ]; then
+	echo "doing debug build"
+	DEBUG_FLAGS="-g -fsanitize=address,undefined -fsanitize-address-use-after-scope"
+	echo "BASE_CFLAGS += $DEBUG_FLAGS
+BASE_CXXFLAGS += $DEBUG_FLAGS
+BASE_LDFLAGS += $DEBUG_FLAGS" >> config.mk
+fi

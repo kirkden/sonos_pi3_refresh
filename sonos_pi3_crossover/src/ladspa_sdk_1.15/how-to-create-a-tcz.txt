@@ -1,0 +1,23 @@
+tce-load -i squashfs-tools-4.x.tcz
+cd /home/tc
+# create the file structure that will hold your tcz
+# change the name mylittle to the name of your package
+# throughout this script
+sudo mkdir -p /home/tc/mylittle/usr/local/tce.installed
+cd /home/tc/mylittle/usr/local/tce.installed
+# a tcc compiled C program that simply shells a system call to run a shell script
+cp /mnt/sdb1/tinycutils/mylittle .
+# a shell script that simply echos a HELLO message to a log file in the tmp folder
+cp /mnt/sdb1/tinycutils/mylittle.sh .
+sudo chmod a=rwx *
+# probably should just be rx...but...
+cd /home/tc
+sudo echo hi >mylittle.tcz
+sudo rm mylittle.tcz
+# pack it all up
+mksquashfs mylittle/ mylittle.tcz
+# dump it in optional with other tczs
+cd /mnt/sda1/tce/optional
+cp /home/tc/mylittle.tcz .
+# Then add it to onboot.lst
+# ALL DONE

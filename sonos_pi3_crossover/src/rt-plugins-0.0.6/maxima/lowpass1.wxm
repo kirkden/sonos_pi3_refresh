@@ -1,0 +1,23 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 13.04.2 ] */
+
+/* [wxMaxima: input   start ] */
+H(s):= wc / (s + wc)   /* analog transfer function */;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+H( 2/T * (z-1) / (z+1) )    /* H(z) by bilinear transform */;
+%, z=1/y, T=2*k/wc          /* write in terms of y=1/z, subst k=wc*T/2 */; 
+newH: rat(%,y);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+/* extract coeffs in H(z) = (b0 + b1*1/z)/(1 + a1*1/z) */
+a0: coeff(denom(newH),y,0);
+a1: coeff(denom(newH)/a0,y,1);
+b0: coeff(num(newH)/a0,y,0);
+b1: coeff(num(newH)/a0,y,1);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

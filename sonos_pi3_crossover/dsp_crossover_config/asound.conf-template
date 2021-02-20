@@ -1,0 +1,154 @@
+###############################################################################
+#
+# Cards - HiFiBerry Amp2+ Left is Mid-range and Right is tweeter
+#
+# Path:  DSP Room setting -> Mono Downmix -> Crossover -> Amp
+#
+###############################################################################
+
+###############################################################################
+#
+# Use this to test ladspa - sudo speaker-test -D p_ladspa_test -c 2 -t wav
+# Creates a very obvious delay_5s
+#
+###############################################################################
+
+pcm.ladspa_test {
+    type ladspa
+#    slave.pcm "plughw:sndrpihifiberry"
+    slave.pcm "default"
+    path "/usr/lib/ladspa";
+    plugins [{
+        label delay_5s
+        input {
+            controls [ 0.8 0.3 ]
+        }
+    }]
+}
+
+pcm.p_ladspa_test {
+    type plug
+    slave.pcm "ladspa_test";
+}
+
+###############################################################################
+#
+# Active crossover, low pass to left channel, high pass to right
+# https://rtaylor.sites.tru.ca/2013/06/25/digital-crossovereq-with-open-source-software-howto/
+#
+###############################################################################
+
+
+pcm.crossover {
+    type ladspa
+    slave.pcm "plughw:sndrpihifiberry"
+    path "/usr/lib/ladspa"
+    channels 2
+    plugins
+    {
+
+	  #
+	  # Left Channel
+	  #
+        0 {
+                label RTlr4lowpass
+                policy none
+                input.bindings.0 "Input"
+                output.bindings.0 "Output"
+	            #
+	            # RTlr4lowpass 	9020
+	            # freq [Hz] 	Linkwitz-Riley 4th-order low pass
+	            #
+                input { controls [ 3000 ] }
+        }
+        1 {	
+                label RTlowshelf
+                policy none
+                input.bindings.0 "Input"
+                output.bindings.0 "Output"
+	            #
+	            # RTlowshelf 	9002 	
+	            # gain [dB], freq [Hz], Q 	low shelving; unity gain at high frequency
+	            #
+                input { controls [ 4 200 1.5 ] }
+        }
+
+	  #
+	  # Right Channel
+	  #
+        2 {	
+                label RTlr4hipass
+                policy none
+                input.bindings.1 "Input"
+                output.bindings.1 "Output"
+                #
+                # RTlr4hipass 	9021 	
+                # freq [Hz] 	Linkwitz-Riley 4th-order high pass
+                #
+                input { controls [ 3000 ] }
+        }
+        3 {	
+                label delay_5s
+                policy none
+                input.bindings.1 "Input"
+                output.bindings.1 "Output"
+	            #
+	            # Delay for phase alignment 20ms and 100% wet
+	            #
+	            input { controls [ 0.02 1 ] }
+
+	    }
+    }
+}
+
+pcm.p_crossover {
+    type plug
+    slave.pcm "crossover"
+}
+
+###############################################################################
+#
+# Stereo to Mono mixdown
+#
+###############################################################################
+
+pcm.downmix_mono {
+    type plug
+    slave.pcm crossover
+    slave.channels 2
+    route_policy average
+    ttable {
+	# Left
+        0.0 1
+        1.0 1
+
+	# Right
+        0.1 1
+        1.1 1
+     }
+}
+
+###############################################################################
+#
+# DSP plugin - Used to replicate Equalizer APO measurements
+# https://github.com/bmc0/dsp
+# https://sourceforge.net/projects/equalizerapo/
+#
+###############################################################################
+
+pcm.room_eq {
+	type plug
+	slave {
+		format FLOAT
+		rate unchanged
+		pcm {
+			type ladspa
+			channels 2
+			path "/usr/lib/ladspa"
+			playback_plugins [{
+				label "ladspa_dsp"
+			}]
+			slave.pcm downmix_mono
+		}
+	}
+}

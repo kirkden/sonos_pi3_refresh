@@ -1,0 +1,28 @@
+The scripts here, written in the R language (www.r-project.org) are for testing the plugins.
+
+ladspa_testing.R: measure (via mls techniques) the magnitude and phase response of every plugin in the collection.
+
+distortion_test.R: put a test signal through one of the plugins, and plot the spectrum 
+
+PRE-REQUISITES:
+
+Install ecasound and sox (for dither):
+
+> sudo apt-get install sox ecasound
+
+Install R libraries "tuneR", "sound" and "fftw".  From the R command-line:
+
+> install.packages( c( "tuneR", "fftw", "sound" ) )
+
+If the "sound" library is no longer in the repositories, grab an archived version from here:
+
+https://cran.r-project.org/src/contrib/Archive/sound/sound_0.6-1.tar.gz
+
+then do
+
+> R CMD INSTALL sound_0.6-1.tar.gz
+
+You also need to compile the code needed for mls signal generation and de-convolution:
+
+> R CMD SHLIB mls.c
+

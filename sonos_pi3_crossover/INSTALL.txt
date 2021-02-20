@@ -1,0 +1,64 @@
+
+### Note need to convert REW files using script, need to reomve contrl-M 
+
+
+#######################################################
+#
+# For piCorePlayer
+#
+#######################################################
+
+# To compile
+tce-load -wi compiletc cmake squashfs-tools
+
+cd src
+sudo make all
+sudo make install
+
+# To run
+tce-load -wi python3.6
+tce-load -wi RPi-GPIO-python3.6.tcz
+
+cp src/sonos-pi3-plugins.tcz /mnt/mmcblk0p2/tce/optional
+Add sonos-pi3-plugins.tcz to /mnt/mmcblk0p2/tce/onboot.lst
+
+cp src/dsp-crossover/asound.confg /etc/asound.conf
+Edit /usr/local/etc/pcp/pcp.cfg --> Change OUTPUT="equal" to OUTPUT="room_eq"
+
+
+#
+# Serial console
+#
+Add to end of cmdline.txt
+console=serial0,115200 earlycon=uart8250,mmio32,0x3f215040
+
+Add to config.txt
+enable_uart=1
+
+#
+# Setup persistent PIP storage
+#
+mkdir -p /mnt/mmcblk0p2/tce/pip3
+sudo -H PYTHONUSERBASE=/mnt/mmcblk0p2/tce/pip3 pip3 install --user squeezebox-controller
+
+cp src/gpio-buttons/start-sbpd.sh
+cp src/gpio-buttons/led_controller.sh
+cp src/gpio-buttons/led_controller.py
+Add to Tweaks-> User Commands
+#1 sudo /home/tc/apps/start-sbpd.sh
+
+make sure below are added to /opt/.filetool.lst and you run filetool.sh -b
+etc/asound.conf
+etc/ladspa_dsp/config  
+usr/local/etc/pcp/pcp.cfg
+home/tc/apps/
+
+and backup filetool.sh -b
+
+# This was done on pop!_os in build environment
+pip3 install --target=. configargparse --upgrade
+
+https://alsa.opensrc.org/Ladspa_(plugin)
+https://github.com/iem-projects/alsa-ladspa-bridge
+https://rtaylor.sites.tru.ca/2013/06/25/digital-crossovereq-with-open-source-software-howto/
+https://www.youtube.com/watch?v=Ev1bSSL8tRA    ### Room EQ

@@ -1,0 +1,5 @@
+configargparse
+gmqtt
+pexpect
+RPi.GPIO
+functools

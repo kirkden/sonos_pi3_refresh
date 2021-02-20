@@ -1,0 +1,456 @@
+*******************************************************************************
+* RECENT CHANGES
+*******************************************************************************
+
+=== 1.1.7 ===
+
+* Implemented fully compatible with EqualizerAPO software digital filters that are
+  now part of the Parametric Equalizer plugin series.
+* Fixed issue that caused VST plugins not to load from cusom user-defined path.
+* Some code parts rewritten for better compatibility with WindowsNT platform.
+* Fixed file listing in the file dialog that caused improper reading of remote directories
+  mounted on the local file system.
+* Changed implementation of LV2 MIDI transport so now plugins utilize only one
+  LV2:Atom input port and one LV2:Atom output port.
+* Fixed bug in host<->UI time and position synchronization for VST plugin format.
+* Fixed AVX+FMA3 implementation of dynamic biquadratic filters that caused improper
+  behaviour of the Multi-band compressor plugin on machines that support AVX and FMA3
+  instruction set.
+* Multiband compressor now properly handles the 'Bypass' button.
+* Fixed return of improper extension pointers when requested extension is different to
+  the ui:idleInterface.
+* Fixed bug in dynamic processor plugin that could issue invalid metering values.
+* Fixed UI size issue for VST plugins in Cockos Reaper.
+* Fixed numerous memory leakage issues in UI components.
+* Fixed spontaneous crashes when destroying the Profiler Mono/Stereo plugin.
+* Fixed embedded resource generation tool that had invalid behaviour for several file systems.
+* Reimplemented I/O subsystem.
+
+=== 1.1.5 ===
+
+* Implemented stereo version of Profiler plugin.
+* Added 'Spectralizer' and 'Mastering' modes to the Spectrum Analyzer plugin series.
+* All SIMD-optimized DSP code now ported to ARMv7A architecture and optimized using ARM NEON instruction set.
+* Added Frame Buffer primitive support by plugins and widgets.
+* Implemented RGBA and HSLA color manipulation routines for point array rendering optimizations.
+* Extended unit and performance test coverage.
+* Enabled RELRO and PIE option for binaries, simplified build system.
+* Implemented optimized DSP functions for minimum and maximum search.
+* Implemented optimized DSP functions for static biquad processing, dynamic biquad processing,
+  dynamic bilinear transformation.
+* Extended DSP code with different set of software rendering functions that enhance visual effects.
+* Added support of FreeBSD operating system (plugins are available for building in FreeBSD ports).
+* Improved build process, added possibility to specify PREFIX variable for
+  installing into specified path instead of /usr/local.
+* Fixed building issues under Ubuntu Linux related to compiler and linker
+  flags reordering.
+* Fixed system character set detection on certain systems that caused disappearing of text labels in the UI.
+* Fixed window decorating issue under the i3 window manager.
+* Fixed biquad filter processing routines that could cause memory corruption and/or invalid behaviour
+  in certain circumstances. 
+* Fixed serious memory corruption in SSE implementation of fast convolution routines that could cause
+  spontaneous crashes of convolvers.
+* Fixed buffer underflow in Convolver module that could cause memory corruption and spontaneous crashes
+  of host.
+
+=== 1.1.4 ===
+
+* Changed licensing to GNU Lesser General Public License version 3 (GNU LGPL v3).
+* Moved code repository to GitHub while keeping release history.
+* Implemented linear impulse response profiler.
+* Added basic Raspberry Pi 3B/3B+ (ARMv7A) support (experimental).
+* Implemented unit testing subsystem.
+* Implemented performance testing subsystem.
+* Implemented manual testing subsystem.
+* Fixed and optimized convolution algorithm for convolver module that produced invalid output.
+* Added LSPC file format implementation.
+* Added LSPC file format support to convolver plugins.
+* Huge refactoring: DSP code moved from core to separate subtree.
+* Partially implemented NEON SIMD instruction support for some DSP assembly functions
+  for ARMv7A architecture.
+* Fixed bugs in some DSP oversampling routines.
+* Optimized complex multiplication functions.
+* Implemented additional complex number routines.
+* Implemented additional functions to DSP core.
+* Fixed compilation warnings and errors emitted by the GCC 8 compiler.
+* Updated development documentation.
+
+=== 1.1.3 ===
+
+* Updated File saving widget to support different kinds of file types.
+* Added support of latency report by JACK version of plugins.
+* Added support of playback position report (BPM, etc) by JACK transport for JACK plugin format.
+* Added support of playback position report (BPM, etc) by host for LV2 plugin format.
+* Added support of playback position report (BPM, etc) by host for VST plugin format.
+* Added emulation of playback position report for LADSPA wrapper.
+* Implemented Fraction widget for editing time signature.
+* Implemented Tempo tap widget for manually adjusting tempo.
+* Added possibility to configure Slap-Back delay plugin series using BPM-related time units.
+* All grid lines are made more 'darken' in the UI.
+* Added delay ramping (interpolation) option for Compensation Delay plugin series. This feature
+  allows to apply soft delay change when applying automation in DAW.
+* Added delay ramping (interpolation) option for Slap-Back Delay plugin series. This feature
+  allows to apply soft delay change when applying automation in DAW.
+* Added modules for reading text files.
+* Re-implemented parameter serializing and deserializing interface for more flexible and safe usage.
+* Added possibility to copy samples and impulse response files between different AudioFile widgets.
+* Fixed GUI crash when pasting data from clipboard.
+* Added ability to move the split bars on the Multiband Compressor's graph with the mouse.
+
+=== 1.1.2 ===
+
+* Implemented Muliband Compressor plugin series.
+* Added possibility to mute playback by triggering the 'note off' MIDI event in sampler plugin series.
+* Implemented ComboGroup wiget for dynamically switching internal contents of the group.
+* Fixed error in filter processing algorithms that could yield to invalid
+  results when source and destination buffers differ.
+* Additionally tuned SSE code of static filters.
+* Refactored CPU identification routines and optimized assembly routines selection.
+* Small fixes in UI grid cell allocation and rendering.
+* Improved design of markers: added gradient highliting.
+* Fixed some UI issues related to switched port values.
+* Removed support of some plugins by LADSPA that can not be supported by LADSPA.
+* Optimized calculations related to logarithmic axis.
+* Fixed bug in UI expression language that incorrectly interpreted 'not' operation.
+* Added power mathematical operator to UI expression language.
+
+=== 1.1.1 ===
+
+* Plugins have been tested under QTractor 0.9.5 and it seems that they are working well.
+* Fixed UI resize issue in Carla host.
+* Fixed UI redraw issue that didn't show widgets for several cases.
+* Optimized spectrum analysis modules by changing code so it now uses more cache-friendly FFT routines.
+* Added graph amplitude scaling to Graphic and Parametric equalizers.
+* Added graph amplitude scaling to Spectrum Analyzer plugin.
+* Fixed possible memory corruption while redrawing the inline display image of parametric equalizer.
+* Fixed possible memory corruption in the Dynamic Processor plugin.
+* Fixed latency report for equalizer plugins.
+* Updated wrapper to make plugins properly supported by Bitwig Studio that doesn't know anything about
+  kVstParameterUsesIntStep and kVstParameterUsesIntegerMinMax flags.
+* Refactored event handling mechanism for widgets: added 'sender' parameter to indicate the widget that
+  initiated slot execution.
+* UI now stores last used path when loading samples, impulse response files and configuration files in
+  the global configuration file.
+* Fixed problem with UI update in cases when window size does not change. Now works properly.
+* Added Mid/Side adjustment knobs for Mid/Side versions of equalizer plugins.
+* Reorganized core modules into more comfortable source code tree.
+* Added support of UI:updateRate parameter reported by the LV2 host to the UI.
+* Added multiple-channel (up to 8 channels) audio file support to Impulse Reverb plugin.
+* Updated documentation related to the Limiter plugin.
+* Added possibility to equalize the processed signal in convolution plugins.
+* JACK version of plugins now automatically handles JACK startup/shutdown and does not require to restart plugin.
+
+=== 1.1.0 ===
+
+* Ported all widgets from GTK+ 2.x to raw X11 + cairo
+* Ardour DAW is supported by the UI as before
+* Mixbus DAW is supported by the UI as before
+* JUCE-based hosts are now supported by UI
+* Tracktion DAWs are now supported by UI
+* Renoise DAW is now supported by UI
+* Bitwig Studio DAW is now supported by UI
+* REAPER native linux version is now supported by UI
+* Updated JACK plugin wrapper to support new UIs
+* Updated VST pluign wrapper to support new UIs
+* Updated LV2 plugin wrapper to support new UIs
+* Implemented LV2:Instance support feature for optimizing LV2 DSP <-> UI transfers
+* Official Steinberg VST 2.4 SDK is not required more for building VST plugins
+* Added version check for JACK core libraries to prevent multiple installations conflict
+* Requirements of naming JACK core library were reduced to only contain 'lsp-plugins' substring
+* Added version check for VST core libraries to prevent multiple installations conflict
+* Requirements of naming VST core library were reduced to only contain 'lsp-plugins' substring
+* Ported Gtk2Box widget to X11UI widgets
+* Ported Gtk2Button widget to X11UI widgets
+* Ported Gtk2Cell widget to X11UI widgets
+* Ported Gtk2Grid widget to X11UI widgets
+* Ported Gtk2Indicator widget to X11UI widgets
+* Ported Gtk2Label widget to X11UI widgets
+* Ported Gtk2Led widget to X11UI widgets
+* Ported Gtk2Separator widget to X11UI widgets
+* Ported Gtk2Switch widget to X11UI widgets
+* Ported Gtk2Knob widget to X11UI widgets
+* Ported Gtk2Meter widget to X11UI widgets
+* Ported Gtk2Group widget to X11UI widgets
+* Ported Gtk2Align widget to X11UI widgets
+* Ported Center widget to X11UI widgets
+* Ported Axis widget to X11UI widgets
+* Ported Marker widget to X11UI widgets
+* Ported Basis widget to X11UI widgets
+* Ported PortAlias widget to X11UI widgets
+* Ported Text widget to X11UI widgets
+* Ported Mesh widget to X11UI widgets
+* Ported Dot widget to X11UI widgets
+* Ported IGraph widget to X11UI widgets
+* Ported Gtk2Graph widget to X11UI widgets
+* Ported Gtk2ComboBox widget to X11UI widgets
+* Ported Gtk2Window widget to X11UI widgets
+* Ported Gtk2File widget to X11UI widgets
+* Ported Gtk2Body widget to X11UI widgets
+* Ported Gtk2MountStud widget to X11UI widgets
+* Implemented ScrollBar widget
+* Implemented Edit widget
+* Implemented ListBox widget
+* Implemented Menu widget
+* Implemented File Save/Open dialog
+* Implemented Hyperlink widget
+* Implemented Fader widget 
+* Implemented File saving widget
+* Implemented basic clipboard support
+* Code clean up and project tree refactoring
+* Fixed inline display drawing issue related to GCC 6 optimization specifics (thanks to Robin Gareus)
+* Changed maximum sample length of the Schlagzeug plugin up to 64 seconds
+* Changed maximum sample length of the Triggersensor plugin up to 64 seconds
+
+=== 1.0.26 ===
+
+* Implemented Latenzmessgerät - Latency Meter plugin.
+* Fixed horizontal meter widget rendering.
+
+=== 1.0.24 ===
+
+* Implemented Oszillator - Oscillator utility plugin.
+* Fixed CPUID bug that caused Segfault on 32-bit systems.
+* Added version to the name of the VST core library to prevent possible conflicts
+  with previous installations.
+* Added version to the name of the JACK core library to prevent possible conflicts
+  with previous installations.
+* Updated debugging engine that allows to write trace file into /tmp.
+* Fixed UI hangup when showing plugin's UI related to gtk_dialog_run() issue.
+
+=== 1.0.23 ===
+
+* Fixed buffer overflow in Slap-back Delay plugin series happening with frame size larger than 512 samples.
+* Updated expression language for the UI: added literal expressions that are more friendly with XML syntax.
+* DSP core functions re-engineering and DSP core interface refactoring.
+* Covered many of SSE DSP functions with unit tests.
+
+=== 1.0.22 ===
+
+* Implemented slap-back delay plugin series.
+* Implemented Impulsnachhall (Impulse Reverb) plugin series as advanced version of Impulsantworten.
+* Implemented FFT routines that work with packed complex numbers. Overall SSE performance is 1.4 times
+  higher on AMD processors and about 1.1 higher on Intel processors.
+* Implemented FFT-based fast convolution routines (Native and SSE) that work with real data input and
+  real data output and allow to avoid bit-reversal shuffle of the signal data. Also there are serious
+  fixes relative to AMD cache penalties. Overall performance bonus is about 1.5 times to the previous
+  convolution implementation.
+* Added Full-oversampling modes to Limiter plugin.
+* Updated LV2 atom transport primitives.
+* Fixed problem in resampler that didn't allow to set oversampling more than 4x.
+* Fixed filter core that didn't properly update settings of filter in the specific case and broke
+  behaviour of oversampler.
+* Minor UI updates.
+
+=== 1.0.20 ===
+
+* Implemented Impulsantworten (Impulse responses) zero-latency high-performance
+  convolution plugin series.
+* Added Mixed Herm, Mixed Exp and Mixed Thin modes to Limiter.
+* Updated Classic mode of Limiter that caused a lot of unpleasant distortion.
+* Added dithering support to Limiter plugin.
+* Added 6x and 8x oversampling support to Limiter plugin.
+* Added lookahead delay line to all dynamic processing plugins (Dynamikprozessor,
+  Kompressor, Gate, Expander).
+* Updated UI of all Spektrumanalysator plugin series. Now it takes less place while
+  keeping the same functionality.
+* Added notification dialog that asks for donations on each version update.
+* Implemented zero-latency convolver core module.
+* Implemented dither core module.
+* Updated delay core module to become more safe while processing passed data to the input.
+* Optimized native implementation of FFT: sine and cosine calculation replaced by complex
+  vector rotating, fixed performance penalties relative to CPU caching issues. 
+* Optimized SSE implementation of FFT: sine and cosine calculation replaced by complex vector
+  rotating, fixed performance penalties relative to CPU caching issues. Overall
+  performance was raised about 4x times.
+* All atom ports for LV2 plugins now have twice greater rsz:minimumSize property.
+* Added workaround for VST plugins that crashed because Ardour didn't properly report
+  sample rate to multiple instances.
+* VST plugins can now be installed as directory with .so files into VST_PATH.
+* Some minor code refactoring.
+
+=== 1.0.18 ===
+
+* Implemented Begrenzer Mono, Stereo, Sidechain Mono, Sidechain Stereo (Limiter) plugin series.
+* Added KVRDC16 entry - Dynamikprozessor Mono, Stereo, LeftRight, MidSide plugin series. 
+* Added 2x/3x/4x oversampling support by DSP modules.
+* Small code refactoring.
+
+=== 1.0.16 ===
+
+* Implemented Expander Mono, Stereo, LeftRight, MidSide plugin series.
+* Implemented Gate Mono, Stereo, LeftRight, MidSide plugin series.
+* Added expression language to XML documents that allows to evaluate floating-point values.
+* Added feature to meter widget: now middle point-relative output is supported.
+* Added possibility to display two values for one metering widget simultaneously.
+* Some metadata corrections.
+* Updated naming of LinuxVST *.so files: all underscore characters are replaced by minuses.
+* Added 'TROUBLESHOOTING' section to README.txt and documentation that describes how to
+  pefrorm detailed bug/crash report.
+* Fixed bug of sidechain triggered when it's working in mid-side mode.
+* Updated UI design of the trigger relative to metering.
+
+=== 1.0.15 ===
+
+* Updated metadata to place english names first for all plugins, and german names afterwards.
+* Updated Triggersensor, Parametrischer Entzerrer, Grafischer Entzerrer, Kompressor plugin series UI:
+  changed input and output level meters that now display both peak and RMS values.
+* Removed JUCE workaround to prevent crashes of Renoise DAW.
+
+=== 1.0.14 ===
+
+* Implemented Kompressor Mono, Stereo, LeftRight, MidSide (Compressor) plugin series
+* Implemented Seitenkette Kompressor (Sidechain Compressor) Mono, Stereo, LeftRight, MidSide
+  plugin series
+* Moved sidechain processing functions into independent separate DSP module.
+* Fixed issue related to LV2 bug that disallows to save preset of plugin if it has
+  square brackets in the name.
+* Fixed build issue triggering on GCC 6: default C++ standard in GCC was changed to C++11,
+  added strict C++98 usage into makefiles.
+* Fixed time drifting between Middle and Side channels in FIR/FFT mode for Graphic
+  Equalizer and Parametric Equalizer.
+* Fixed and updated metadata of Graphic Equalizer plugin: now filters have individual
+  pre-defined frequencies, Graphic Equalizer's tranlation is corrected to 'Graphic Equalizer';.
+* Re-worked LSP Parametrischer Equalizer plugin series: added filter mode parameter.
+* A bit improved support of LinuxVST for Tracktion DAW and other JUCE'd plugins. Great thanks
+  to Nick Dowell, the developer of amsynth. Still, there are problems with UI redraw.
+* Implemented biquad x8 filter bank using SSE, SSE3, AVX and FMA instructions,
+  overall performance goal is about 1.8x on x86_64 architecture, i586 architecture
+  has no performance regressions when switching from two x4 banks to one x8 bank.
+* Fixed issues with peak value transfer from DSP to UI for VST and JACK versions of plugin.
+
+=== 1.0.12 ===
+
+* Implemented LSP Grafischer Entzerrer (Graphic Equalizer) x16 Mono/Stereo/LeftRight/MidSide plugin series.
+* Implemented LSP Grafischer Entzerrer (Graphic Equalizer) x32 Mono/Stereo/LeftRight/MidSide plugin series.
+* Additional package with HTML documentation is now provided.
+* Fixed behaviour of trigger-type button when right mouse click occurs.
+* Added output balance knob to LSP Parametrischer Entzerrer Stereo/LeftRight/MidSide plugin series.
+* Implemented multiband crossover processor in DSP core for future use.
+* Added Inline Display LV2 extension support provided by Ardour to all LV2 plugin series that
+  use interactive graphic output.
+* Standalone versions of plugins now draw their state on window icons similarly to Inline Display extension.
+* Optmized processing speed of IIR filters, overall acceleration is about 1.5x for filters with low
+  number of poles and zeros, about 5x for filters with high amount of poles and zeros.
+* Optimized equalizer structure by using filter banks. Low-pole filters in equalizer are combined into 4x
+  biquad filter banks. Overall performance improvement is about 4x.
+* Floating-point calculations are more accurate now for FIR filters.
+* Added output signal metering to LSP Parametrischer Entzerrer plugin series.
+* Moved spectrum analysis into separate core module for making re-usable.
+* Fixed bugs of floating-point number formatting by the 'indicator' widget.
+* Added possibility to minimize visual space used by plugin by reducing size of rack mount studs in the UI.
+* Plugin UIs now store global configuration in ~/.config/lsp-plugins/lsp-plugins.cfg file.
+* Fixed MIDI output for JACK wrapper.
+* Added avoiding of denormal floating point values that may cause extra CPU performance penalty by
+  modifying MXCSR register value before audio processing stage and restoring it's value after
+  audio processing stage.
+
+=== 1.0.11 ===
+
+* Optimized graph widget relative to axis objects, logarithmic scaling
+  is now implemented in SSE2 and is about 6 times faster than native implementation.
+* Refactored widget rendering subsystem: FPS is lowered and stabilized around 20 FPS.
+* Implemented additional compression of built-in XML resources for the UI, now
+  XML resources obtain about 3 times lower space in binaries.
+* Highly optimized rendering of Gtk2Graph and Gtk2File widgets that caused excessive CPU load:
+  the CPU utilization is now about 7 times lower.
+
+=== 1.0.10 ===
+
+* Implemented Parametrischer Entzerrer (Parametric Equalizer) x16 Mono/Stereo/LeftRight/MidSide plugin series.
+* Implemented Parametrischer Entzerrer (Parametric Equalizer) x32 Mono/Stereo/LeftRight/MidSide plugin series.
+* Profiling release now available for standalone version of plugins. Requires JACK server.
+* Updated formulas for noise envelopes of Spektrumanalysator plugin series.
+* Fixed convolution function in DSP that returned zero on small convolutions.
+* Fixed bugs in some functions.
+* Implemented SSE routines for operations on small vectors of 4 elements.
+* Implemented SSE routines for bulk biquad filter processing.
+* Updated license text relative to project developers and project maintainers.
+* Implemented filter core.
+* Implemented equalizer core that supports IIR, FIR and FFT filtering.
+
+=== 1.0.8 ===
+
+* Implemented Triggersensor Mono/Stereo plugin series.
+* Implemented Triggersensor MIDI Mono/Stereo plugin series.
+* Implemented JACK wrapper, all plugins now have their standalone implementations.
+* Updated LV2 transport: now plugins do not transport primitives when there is no UI connected.
+* Updated LADSPA wrapper: added latency reporting ports for the plugins.
+* Implemented peak transfer protocol for peak values.
+* Implemented metering widget for UI.
+
+=== 1.0.7 ===
+
+* Fixed the broken UI for Spektrumanalysator x4, x8, x16.
+* Added test that displays all UI and can be launched before the build.
+* Minimized the size of the Schlagzeug plugin series UI.
+
+=== 1.0.6 ===
+
+* Reorganized source tree. Splitted plugin metadata into separate files and moved from core to the new directory.
+* Fixed errors in formulas of noise envelopes for Spektrumanalysator.
+* Fixed some bugs in DSP SSE module functions caused to possible crash plugins on some conditions.
+* Implemented audio resampling algorithm for audio files using N-period Lanczos kernel convolution.
+* Implemented some core primitives like Toggle, Blink etc.
+* Added support of MIDI events for LV2.
+* Added support of MIDI events for VST.
+* Added support of plugin state serialization for VST.
+* Implemented port sets for reducing plugin's port overhead.
+* Implemented indexed proxy ports for the UI.
+* Re-engineered LV2 Atom transport subsystem.
+* Re-engineered LinuxVST transport subsystem.
+* Additional feature ('quick tune') implemented for knob control (available when clicking on the knob's scale).
+* Implemented serialization/deserialization of plugin state to plain text files (available in UI when clicking on logo or model acronym).
+* Optimized the size of XML data (implemented 'ui:for' tag for cycles in XML documents).
+* Optimized LV2 TTL generator for more compact RDF output, fixed some problems in RDF format.
+* Changed the color of 'Bypass' swtich to red.
+* Implemented Klangerzeuger (Sampler) plugin Mono/Stereo series.
+* Implemented Schlagzeug (Multi-Sampler) plugin x12, x24, x48 Stereo/Direktausgabe (DirectOut) series.
+
+=== 1.0.4 ===
+
+* Reduced size of mesh to 192 points for Phasendetektor.
+* Reduced mesh refresh rate to 20 Hz.
+* Fixed metadata for Phasendetektor (ID of 'best value' meter was mistyped).
+* Added LV2 Units support for the plugins.
+* Optimized some of bulk data operations with SSE.
+* SSE-based DSP module now is built-in for all releases and dynamically turns on when possible.
+* Implemented FFT algorithm with SSE-specific optimizations.
+* Implemented support of ports containing file names for LV2 (LV2 Paths).
+* Implemented support of plugin state serialization for LV2 (LV2 State).
+* Implemented support of LV2 worker interface (LV2 Worker).
+* Implemented support of native worker interface (based on pthreads).
+* Implemented Spektrumanalysator (Spectrum Analyser) plugin series (x1, x2, x4, x8, x12 and x16).
+
+=== 1.0.3 ===
+
+* Reduced mesh primitive synchronization rate to 25 Hz for LV2 Atoms.
+* Simplified core plugin class.
+* Simplified plugin UI class.
+* Optimized DSP for SSE instruction set.
+* Optimized Phasendetektor for DSP usage.
+* Changed name of LinuxVST distribution from 'vst' to 'lxvst'.
+* Removed dynamic_cast from C++ code and RTTI from linkage.
+* XML documents now are built-in resources, expat library is required
+  only for building binaries.
+
+=== 1.0.2 ===
+
+* Implemented plugin wrapping layer for more flexible plugin control.
+* Added GUI wrapper for LinuxVST plugins.
+
+=== 1.0.1 ===
+
+* Fixed bugs in SSE assembly code discovered at 44100 Hz sample rate.
+* Optimized SSE DSP processor: now it doesn't need to be an instance
+  of the class.
+* Fixed assertion issues with GTK+ support on UI close and destroy
+  for LV2.
+* Implemented generic LinuxVST support for plugins. Currently UI is not
+  supported.
+* Updated plugin metadata to become more compatible with VST.
+
+=== 1.0.0 ===
+
+* Initial version. Implemented plugins:
+  - LSP Phasendetektor - Phase Detector
+  - LSP Verzögerungsausgleicher - Delay compensator

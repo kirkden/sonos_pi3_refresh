@@ -1,0 +1,44 @@
+## [0.0.6] - 2017-01-04
+
+  * src/*.c: put 'set_run_adding_gain = NULL' in all plugins for compatibility
+    with some LADPSA hosts; thanks to John Rigg
+  * CMakeLists.txt: change "_BSD_SOURCE" (deprecated in gcc) to "_DEFAULT_SOURCE"
+  * cleanup: delete cmake-generated files before packaging
+  * src/RTdecorrmls.c: new (undocumented) stereo decorrelation by convolution
+    with mls signals
+
+## [0.0.5] - 2016-03-07
+
+  * : build cleanup; thanks to Daniel Guermeur.  No code changes.
+
+## [0.0.4] - 2015-08-11
+
+	* : move to cmake for build management, plus folder re-restructuring and
+    code cleanups, all thanks to Florian Franzmann
+	* include/biquad.h, src/RTlowpass1.c, src/RThighpass1.c: implement first-order
+    low- and high-pass filters
+	*	maxima/: maxima code for deriving biquad/bilin coefficients via bilinear transform
+	* testing/: R code to measure and plot magnitude/phase responses of all filters,
+    plus measure distortion (due e.g. to quantization of coefficients)
+
+## [0.0.3] - 2013-09-02
+
+	* Makefile: remove -march=native because it breaks the build on RPi
+	* biquad.h, RTallpass1.c, RTallpass2.c: use factoring to reduce floating-
+		point multiplications for allpass filters
+
+## [unreleased] - 2013-07-14
+
+	* biquad.h, RTallpass2.c: use Q instead of bw to parametrize 2nd-order allpass
+
+## [unreleased] - 2013-07-11
+
+	* biquad.h: make 1st-order allpass non-inverting
+
+## [0.0.2] - 2013-06-25
+
+	* biquad.h, *.c: remove DAZ/FTZ denormal handling so we can build for ARM;
+		instead add a low-level (-360dB) square-wave at the Nyquist frequency
+		as a denormal killer
+	* Makefile: remove SSE2 stuff so we can build for ARM
+

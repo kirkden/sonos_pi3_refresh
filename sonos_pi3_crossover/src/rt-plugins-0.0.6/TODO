@@ -1,0 +1,3 @@
+- Port all plugins to lv2 (http://lv2plug.in), the successor or ladspa.  Eventually the ladspa API will be deprecated.
+
+- 

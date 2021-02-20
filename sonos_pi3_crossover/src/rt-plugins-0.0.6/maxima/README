@@ -1,0 +1,2 @@
+The files here are in the maxima language (maxima.sourceforge.net).  They give the derivation of IIR filter coefficients for some standard analog filters, using the bilinear transform.
+
